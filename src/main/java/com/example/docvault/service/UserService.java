@@ -15,11 +15,12 @@ public class UserService {
 
     public User registerUser(User user) {
 
+        validateUser(user);
+
         if (userRepository.existsByEmail(user.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            throw new IllegalArgumentException("Email already registered");
         }
 
-        // Default role
         user.setRole("USER");
 
         return userRepository.save(user);
@@ -27,5 +28,20 @@ public class UserService {
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    private void validateUser(User user) {
+
+        if (user.getName() == null || user.getName().isBlank()) {
+            throw new IllegalArgumentException("Name cannot be empty");
+        }
+
+        if (user.getEmail() == null || user.getEmail().isBlank()) {
+            throw new IllegalArgumentException("Email cannot be empty");
+        }
+
+        if (user.getPassword() == null || user.getPassword().length() < 6) {
+            throw new IllegalArgumentException("Password must be at least 6 characters");
+        }
     }
 }
